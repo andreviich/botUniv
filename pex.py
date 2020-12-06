@@ -161,7 +161,6 @@ def usualMessage(message):
 				tryAgain(message,'Преподаватель не найден')
 				return
 			try:
-				OutMessage(message,group)
 				id_group = groups['id'].where(groups['name'] == group).dropna().astype('int32').values.tolist()[0]
 			except Exception as e:
 				tryAgain(message,'Данная группа не обнаружена в списке')
