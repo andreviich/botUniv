@@ -5,7 +5,7 @@ import telebot
 import time
 set_option('display.max_rows', settings.MAX_ROWS)
 bot = telebot.TeleBot(settings.TOKEN)
-
+# print(dir(telebot))
 # print('Загружаю группы... ')
 groups = read_csv('groups.csv', sep=";")
 # print('Загружаю результаты... ')
@@ -23,48 +23,55 @@ def send_welcome(message):
 	bot.send_message(
 		message.chat.id, 'Привет! Добро пожаловать в бот!'
 	)
-# print("""
-# Для получения студентов по наименованию группы введите команду 'студенты' и название группы в верхнем или нижнем регистре. Например: 'студенты ПИ1-1'
-# """)
-# print("""
-# Для получения преподавателей по наименованию группы введите команду 'преподаватели' и название группы в верхнем или нижнем регистре. Например: 'преподаватели ПИ1-1'
-# """)
-# print("""
-# Для получения списка группы у определенного преподавателя введите команду 'группы' и фамилию преподавателя в именительном падеже. Например: 'группы Милованов'
-# """)
-# print("""
-# Для получения оценок конкретного студента введите команду 'оценки', фамилию и имя студента в именительном падеже. Например: 'оценки Бирюков Максим'
-# """)
-# print("""
-# Для получения среднего балла всех студентов у конкретного преподавателя введите команду 'средний балл' и фамилию преподавателя в именительном падеже. Например: 'средний балл Милованов'
-# """)
-#
-# print("""
-# Для для того, чтобы узнать, ведет ли данный преподаватель у конкретной группы, введите "ведёт" ,  фамилию преподавателя в именительном падеже и название группы. Например: 'ведёт Милованов ПИ1-1'
-# """)
-# print("""
-# Для для того, чтобы узнать все оценки по конкретному предмету, введите "оценки по предмету" и название предмета. Например: 'оценки по предмету философия'
-# """)
-# print("""
-# Для для того, чтобы узнать все оценки у конкретного преподавателя, введите "оценки преподавателя" и фамилию преподавателя в именительном падеже. Например: 'оценки преподавателя Милованов'
-# """)
-# print("""
-# Для для того, чтобы узнать все оценки у конкретного преподавателя, введите "оценки преподавателя" и фамилию преподавателя в именительном падеже. Например: 'оценки преподавателя Милованов'
-# """)
 def tryAgain(message, msg):
-	time.sleep(0.5)
+	time.sleep(settings.INTERVAL)
 	bot.send_message(
 		message.chat.id, msg
 	)
 def OutMessage(message, msg):
-	time.sleep(0.5)
+	time.sleep(settings.INTERVAL)
 	bot.send_message(
 		message.chat.id, msg
 	)
+@bot.message_handler(commands=['help'])
+def help(message):
+	bot.send_message(message.chat.id, 'Вывод всех команд...')
+	OutMessage(message, """
+Для получения студентов по наименованию группы введите команду 'студенты' и название группы в верхнем или нижнем регистре. Например: 'студенты ПИ1-1'
+""")
+	OutMessage(message, """
+Для получения преподавателей по наименованию группы введите команду 'преподаватели' и название группы в верхнем или нижнем регистре. Например: 'преподаватели ПИ1-1'
+""")
+	OutMessage(message, """
+		Для получения списка групп у определенного преподавателя введите команду 'группы' и фамилию преподавателя в именительном падеже. Например: 'группы Милованов'
+""")
+	OutMessage(message, """
+Для получения оценок конкретного студента введите команду 'оценки', фамилию и имя студента в именительном падеже. Например: 'оценки Бирюков Максим'
+""")
+	OutMessage(message, """
+Для получения среднего балла всех студентов у конкретного преподавателя введите команду 'средний балл' и фамилию преподавателя в именительном падеже. Например: 'средний балл Милованов'
+""")
+	OutMessage(message, """
+Для для того, чтобы узнать, ведет ли данный преподаватель у конкретной группы, введите "ведёт" ,  фамилию преподавателя в именительном падеже и название группы. Например: 'ведёт Милованов ПИ1-1'
+""")
+	OutMessage(message, """
+Для для того, чтобы узнать все оценки по конкретному предмету, введите "оценки по предмету" и название предмета. Например: 'оценки по предмету философия'
+""")
+	OutMessage(message, """
+Для для того, чтобы узнать все оценки студентов у конкретного преподавателя, введите "оценки преподавателя" и фамилию преподавателя в именительном падеже. Например: 'оценки преподавателя Милованов'
+""")
+	OutMessage(message, """
+Для для того, чтобы узнать все оценки у конкретного преподавателя, введите "оценки преподавателя" и фамилию преподавателя в именительном падеже. Например: 'оценки преподавателя Милованов'
+""")
+	OutMessage(message, """
+Для для того, чтобы узнать все оценки у конкретного преподавателя, введите "оценки преподавателя" и фамилию преподавателя в именительном падеже. Например: 'оценки преподавателя Милованов'
+""")
+	OutMessage(message, """
+Возвращает количество оценок 5, 4, 3, 2 у данной группы и преподавателя разбитые по предметам. Для вызова этой команды введите фамилию преподавателя и название группы. Например, 'Милованов пи1-1'
+""")
 @bot.message_handler(content_types=['text'])
 def usualMessage(message):
 	comm = message.text
-	# comm = input('Введите команду... ').upper()
 	comm = comm.upper().split()
 	allSubjects = subjects['subject_name'].values.tolist()
 	allTeachers = teachers['last_name'].values.tolist()
@@ -83,6 +90,8 @@ def usualMessage(message):
 			studentsOfThisGroup = students[['last_name', 'first_name']].where(students['group_id'] == id_group).dropna()
 			OutMessage(message,f'Студенты группы {group}:')
 			OutMessage(message,studentsOfThisGroup.to_string(index=False, header=['Фамилия', 'Имя'],justify="left"))
+			# bot.send_message(message.chat.id, studentsOfThisGroup.to_html(index=False, header=['Фамилия', 'Имя'],justify="left"), parse_mode="HTML")
+			print(studentsOfThisGroup.to_html(index=False, header=['Фамилия', 'Имя'],justify="left"))
 		getAllStudents(group)
 	if 'ПРЕПОДАВАТЕЛИ' in comm:
 		group = comm[1]
@@ -129,13 +138,11 @@ def usualMessage(message):
 			try:
 				idStudent = students['id'].where((students['last_name'] == last_name) & (students['first_name'] == first_name)).dropna().astype('int32').values.tolist()[0]
 			except Exception as e:
-				# raise(e)
 				tryAgain(message,'Студент не найден')
 				return
 			resStudent = results[[ 'subject','att1', 'att2', 'exam', 'total']].where(results['student_id'] == idStudent).dropna().astype('int32')
 			resStudent = subjects.merge(resStudent, left_on="id", right_on="subject")[['subject_name', 'total']]
 			outputResStudent = resStudent.to_string(index=False, header=['Предмет','Тотал'], justify="center")
-			# OutMessage(message,outputResStudent)
 			print(outputResStudent)
 			bot.send_message(message.chat.id, outputResStudent, parse_mode = "Markdown")
 		getAllPoints(first_name, last_name)
@@ -184,19 +191,26 @@ def usualMessage(message):
 			except:
 				tryAgain(message,'Преподаватель не найден')
 				return
-			allpoints = results[['student_id', 'total']].where(results['teacher_id'] == idTeacher).dropna().astype('int32')
-			OutMessage(message,allpoints)
+			allpoints = results[['student_id', 'total']].where(results['teacher_id'] == idTeacher).dropna().astype('int32').values.tolist()
+			for st, point in allpoints:
+				OutMessage(message, f'Номер студака: {st} Балл: {point}')
+			# OutMessage(message,allpoints)
+			
 		getAllPointsOfTeacher(teacher)
 	if 'ОЦЕНКИ' in comm and 'ПО' in comm and 'ПРЕДМЕТУ' in comm:
 		subject = comm[3:]
 		subject = ' '.join(subject).lower().capitalize()
+		print(subject)
 		def getAllPointsOfSubject(subject):
 			try:
 				idSubject = subjects['id'].where(subjects['subject_name'] == subject).dropna().astype('int32').values.tolist()[0]
+				print(idSubject)
 			except:
 				tryAgain(message,'Предмет не найден')
 				return
-			allpoints = results[['student_id', 'total']].where(results['subject'] == idSubject).dropna().astype('int32')
+			allpoints = results[['student_id', 'total']].where(results['subject'] == idSubject).dropna().astype('int32').values.tolist()
+			for st, point in allpoints:
+				OutMessage(message, f'Номер студака: {st} Балл: {point}')
 		getAllPointsOfSubject(subject)
 	if len(comm)==2:
 		teacher = comm[0].lower().capitalize()
@@ -250,6 +264,8 @@ def usualMessage(message):
 			elif teacher not in allTeachers and group in groups:
 				tryAgain(message,'Преподаватель не найден')
 				return
+			elif 'СТУДЕНТЫ' in comm or 'ПРЕПОДАВАТЕЛИ' in comm:
+				pass 
 			else:
 				tryAgain(message,'Команда была введена неверно, повторите попытку. Для вывода всех команд введите команду "команды"')
 				return
