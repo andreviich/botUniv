@@ -90,12 +90,10 @@ def usualMessage(message):
 				return
 			studentsOfThisGroup = students[['last_name', 'first_name']].where(students['group_id'] == id_group).dropna().values.tolist()
 			OutMessage(message,f'Студенты группы {group}:')
-			# OutMessage(message,studentsOfThisGroup.values.tolist())
 			msg = ''
 			for i in studentsOfThisGroup:
 				i = '- ' + ' '.join(i) + '\n'
 				msg = msg + i
-			# TeachersOfThisGroup = TeachersOfThisGroup.to_string(index=False, header=False)
 			OutMessage(message,msg)
 		getAllStudents(group)
 	if 'ПРЕПОДАВАТЕЛИ' in comm:
@@ -120,10 +118,11 @@ def usualMessage(message):
 		getAllTeachers(group)
 	if 'ГРУППЫ' in comm and 'ОЦЕНКИ' not in comm:
 		teacher = comm[1].lower().capitalize()
+		print(teacher)
 		OutMessage(message,f'Вывод групп преподавателя {teacher}')
 		def grps(teacher):
 			try:
-				idTeacher = teachers['id'].where(teachers['last_name'] == teacher).dropna().astype('int32')[0]
+				idTeacher = teachers['id'].where(teachers['last_name'] == teacher).dropna().astype('int32').values.tolist()[0]
 			except:
 				tryAgain(message,'Преподаватель не найден')
 				return
@@ -154,10 +153,13 @@ def usualMessage(message):
 				tryAgain(message,'Студент не найден')
 				return
 			resStudent = results[[ 'subject','att1', 'att2', 'exam', 'total']].where(results['student_id'] == idStudent).dropna().astype('int32')
-			resStudent = subjects.merge(resStudent, left_on="id", right_on="subject")[['subject_name', 'total']]
-			outputResStudent = resStudent.to_string(index=False, header=['Предмет','Тотал'], justify="center")
-			print(outputResStudent)
-			bot.send_message(message.chat.id, outputResStudent, parse_mode = "Markdown")
+			resStudent = subjects.merge(resStudent, left_on="id", right_on="subject")[['subject_name', 'total']].values.tolist()
+			msg = ''
+			msg = msg + f'Оценки студента {last_name} {first_name}:\n------------\n'
+			for disc, total in resStudent:
+				msg = msg + f'{disc} : {total}\n'
+			# print(outputResStudent)
+			OutMessage(message, msg)
 		getAllPoints(first_name, last_name)
 	if 'СРЕДНИЙ' in comm and len(comm) == 3:
 		teacher = comm[2].lower().capitalize()
