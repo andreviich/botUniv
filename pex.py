@@ -58,13 +58,14 @@ def help(message):
 Для для того, чтобы узнать все оценки по конкретному предмету, введите "оценки по предмету" и название предмета. Например: 'оценки по предмету философия'
 """)
 	OutMessage(message, """
+Для для того, чтобы узнать все оценки студентов определенной группы по конкретному предмету, введите "оценки группы", наименование группы и предмет. Например: 'оценки группы пи1-1 Философия'
+""")
+	OutMessage(message, """
+Для для того, чтобы узнать все оценки студентов определенной группы у определенного преподавателя, введите "оценки группы", наименование группы, слово 'преподаватель' и фамилию преподавателя в именительном падеже. Например: 'оценки группы пи1-1 преподаватель Милованов'
+""")
+
+	OutMessage(message, """
 Для для того, чтобы узнать все оценки студентов у конкретного преподавателя, введите "оценки преподавателя" и фамилию преподавателя в именительном падеже. Например: 'оценки преподавателя Милованов'
-""")
-	OutMessage(message, """
-Для для того, чтобы узнать все оценки у конкретного преподавателя, введите "оценки преподавателя" и фамилию преподавателя в именительном падеже. Например: 'оценки преподавателя Милованов'
-""")
-	OutMessage(message, """
-Для для того, чтобы узнать все оценки у конкретного преподавателя, введите "оценки преподавателя" и фамилию преподавателя в именительном падеже. Например: 'оценки преподавателя Милованов'
 """)
 	OutMessage(message, """
 Возвращает количество оценок 5, 4, 3, 2 у данной группы и преподавателя разбитые по предметам. Для вызова этой команды введите фамилию преподавателя и название группы. Например, 'Милованов пи1-1'
@@ -109,7 +110,7 @@ def usualMessage(message):
 			TeachersOfThisGroup = TeachersOfThisGroup.to_string(index=False, header=False)
 			OutMessage(message,TeachersOfThisGroup)
 		getAllTeachers(group)
-	if 'ГРУППЫ' in comm:
+	if 'ГРУППЫ' in comm and 'ОЦЕНКИ' not in comm:
 		teacher = comm[1].lower().capitalize()
 		OutMessage(message,f'Вывод групп преподавателя {teacher}')
 		def grps(teacher):
@@ -197,6 +198,38 @@ def usualMessage(message):
 			# OutMessage(message,allpoints)
 			
 		getAllPointsOfTeacher(teacher)
+	if 'ОЦЕНКИ'	in comm and 'ГРУППЫ' in comm and 'ПРЕПОДАВАТЕЛЬ' in comm and len(comm) > 4:
+		group = comm[2]
+		teacher = comm[4].lower().capitalize()
+		print(group, teacher)
+		if group in allGroups:
+			if teacher in allTeachers:
+				idTeacher = teachers['id'].where(teachers['last_name'] == teacher).dropna().astype('int32').values.tolist()[0]
+				id_group = groups['id'].where(groups['name'] == group).dropna().astype('int32').values.tolist()[0]
+				idsStudents = students['id'].where(students['group_id'] == id_group).dropna().astype('int32').values.tolist()
+				allPoints = results[['student_id','total']].where((results['teacher_id'] == idTeacher)&(results['student_id'].isin(idsStudents))).dropna().astype('int32').to_string(index=False, header=['Студак', 'Балл'])
+				OutMessage(message, allPoints)
+			else:
+				tryAgain(message, 'Преподаватель не найден')
+		else:
+			tryAgain(message, "Группа не найдена")
+	if 'ОЦЕНКИ'	in comm and 'ГРУППЫ' in comm and len(comm) > 3 and 'ПРЕПОДАВАТЕЛЬ' not in comm:
+		group = comm[2]
+		subject = comm[3:]
+		subject = ' '.join(subject).lower().capitalize()
+		if group in allGroups:
+			if subject in allSubjects:
+				idSubject = subjects['id'].where(subjects['subject_name'] == subject).dropna().astype('int32').values.tolist()[0]
+				id_group = groups['id'].where(groups['name'] == group).dropna().astype('int32').values.tolist()[0]
+				idsStudents = students['id'].where(students['group_id'] == id_group).dropna().astype('int32').values.tolist()
+				allPoints = results[['student_id','total']].where((results['subject'] == idSubject)&(results['student_id'].isin(idsStudents))).dropna().astype('int32').to_string(index=False, header=['Студак', 'Балл'])
+				OutMessage(message, allPoints)
+			else:
+				tryAgain(message, 'Предмет не найден')
+		else:
+			tryAgain(message, "Группа не найдена")
+
+	
 	if 'ОЦЕНКИ' in comm and 'ПО' in comm and 'ПРЕДМЕТУ' in comm:
 		subject = comm[3:]
 		subject = ' '.join(subject).lower().capitalize()
