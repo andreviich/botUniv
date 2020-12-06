@@ -1,6 +1,7 @@
 from pandas import read_csv, DataFrame, set_option
 import settings
 from telebot import types
+from telebot import util
 import telebot
 import time
 set_option('display.max_rows', settings.MAX_ROWS)
@@ -192,9 +193,12 @@ def usualMessage(message):
 			except:
 				tryAgain(message,'Преподаватель не найден')
 				return
-			allpoints = results[['student_id', 'total']].where(results['teacher_id'] == idTeacher).dropna().astype('int32').values.tolist()
-			for st, point in allpoints:
-				OutMessage(message, f'Номер студака: {st} Балл: {point}')
+			allpoints = results[['student_id', 'total']].where(results['teacher_id'] == idTeacher).dropna().astype('int32').to_string(index=False)
+			# for st, point in allpoints:
+			# 	OutMessage(message, f'Номер студака: {st} Балл: {point}')
+			splitted_text = util.split_string(allpoints, 3000)
+			for text in splitted_text:
+				OutMessage(message, text)
 			# OutMessage(message,allpoints)
 			
 		getAllPointsOfTeacher(teacher)
