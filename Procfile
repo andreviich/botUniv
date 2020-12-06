@@ -1,1 +1,1 @@
-worker: python3 pex.py
+worker: python pex.py
