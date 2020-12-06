@@ -88,11 +88,15 @@ def usualMessage(message):
 			except:
 				tryAgain(message,'Группа не найдена')
 				return
-			studentsOfThisGroup = students[['last_name', 'first_name']].where(students['group_id'] == id_group).dropna()
+			studentsOfThisGroup = students[['last_name', 'first_name']].where(students['group_id'] == id_group).dropna().values.tolist()
 			OutMessage(message,f'Студенты группы {group}:')
-			OutMessage(message,studentsOfThisGroup.to_string(index=False, header=['Фамилия', 'Имя'],justify="left"))
-			# bot.send_message(message.chat.id, studentsOfThisGroup.to_html(index=False, header=['Фамилия', 'Имя'],justify="left"), parse_mode="HTML")
-			print(studentsOfThisGroup.to_html(index=False, header=['Фамилия', 'Имя'],justify="left"))
+			# OutMessage(message,studentsOfThisGroup.values.tolist())
+			msg = ''
+			for i in studentsOfThisGroup:
+				i = '- ' + ' '.join(i) + '\n'
+				msg = msg + i
+			# TeachersOfThisGroup = TeachersOfThisGroup.to_string(index=False, header=False)
+			OutMessage(message,msg)
 		getAllStudents(group)
 	if 'ПРЕПОДАВАТЕЛИ' in comm:
 		group = comm[1]
@@ -109,9 +113,9 @@ def usualMessage(message):
 			TeachersOfThisGroup = teachers[['last_name', 'first_name', 'middle_name']].where(teachers['id'].isin(idTeachersOfThisGroup)).dropna().values.tolist()
 			msg = ''
 			for i in TeachersOfThisGroup:
-				i = ' '.join(i) + '\n'
+				i = '- ' + ' '.join(i) + '\n'
 				msg = msg + i
-			TeachersOfThisGroup = TeachersOfThisGroup.to_string(index=False, header=False)
+			# TeachersOfThisGroup = TeachersOfThisGroup.to_string(index=False, header=False)
 			OutMessage(message,msg)
 		getAllTeachers(group)
 	if 'ГРУППЫ' in comm and 'ОЦЕНКИ' not in comm:
@@ -131,8 +135,12 @@ def usualMessage(message):
 				if id not in idsGroup_undublicated:
 					idsGroup_undublicated.append(id)
 			idsGroup_undublicated.sort()
-			namesOfGroups = groups['name'].where(groups['id'].isin(idsGroup_undublicated)).dropna().to_string(index=False, header=False)
-			OutMessage(message,namesOfGroups)
+			namesOfGroups = groups['name'].where(groups['id'].isin(idsGroup_undublicated)).dropna().values.tolist()
+			msg = ''
+			for i in namesOfGroups:
+				i = '- ' + i + '\n'
+				msg = msg + i
+			OutMessage(message,msg)
 		grps(teacher)
 	if 'ОЦЕНКИ' in comm and len(comm)==3 and not 'ПРЕПОДАВАТЕЛЯ' in comm:
 		first_name = comm[2]
@@ -301,7 +309,7 @@ def usualMessage(message):
 			elif teacher not in allTeachers and group in groups:
 				tryAgain(message,'Преподаватель не найден')
 				return
-			elif 'СТУДЕНТЫ' in comm or 'ПРЕПОДАВАТЕЛИ' in comm:
+			elif 'СТУДЕНТЫ' in comm or 'ПРЕПОДАВАТЕЛИ' in comm or 'ГРУППЫ' in comm:
 				pass 
 			else:
 				tryAgain(message,'Команда была введена неверно, повторите попытку. Для вывода всех команд введите команду "/help"')
