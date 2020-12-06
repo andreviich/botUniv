@@ -1,7 +1,6 @@
 from pandas import read_csv, DataFrame, set_option
 import settings
 from telebot import types
-from telebot import util
 import telebot
 import time
 set_option('display.max_rows', settings.MAX_ROWS)
@@ -107,9 +106,13 @@ def usualMessage(message):
 			firstStudentOfThisGroup = students[['id']].where(students['group_id'] == id_group).dropna().iloc[0]
 			idFirstStudentOfThisGroup= round(float(firstStudentOfThisGroup.to_string(index=False, header=False)))
 			idTeachersOfThisGroup = results['teacher_id'].where(results['student_id'] == idFirstStudentOfThisGroup).dropna().astype('int32').values.tolist()
-			TeachersOfThisGroup = teachers[['last_name', 'first_name', 'middle_name']].where(teachers['id'].isin(idTeachersOfThisGroup)).dropna()
+			TeachersOfThisGroup = teachers[['last_name', 'first_name', 'middle_name']].where(teachers['id'].isin(idTeachersOfThisGroup)).dropna().values.tolist()
+			msg = ''
+			for i in TeachersOfThisGroup:
+				i = ' '.join(i) + '\n'
+				msg = msg + i
 			TeachersOfThisGroup = TeachersOfThisGroup.to_string(index=False, header=False)
-			OutMessage(message,TeachersOfThisGroup)
+			OutMessage(message,msg)
 		getAllTeachers(group)
 	if 'ГРУППЫ' in comm and 'ОЦЕНКИ' not in comm:
 		teacher = comm[1].lower().capitalize()
@@ -194,11 +197,8 @@ def usualMessage(message):
 				tryAgain(message,'Преподаватель не найден')
 				return
 			allpoints = results[['student_id', 'total']].where(results['teacher_id'] == idTeacher).dropna().astype('int32').to_string(index=False)
-			# for st, point in allpoints:
-			# 	OutMessage(message, f'Номер студака: {st} Балл: {point}')
-			splitted_text = util.split_string(allpoints, 3000)
-			for text in splitted_text:
-				OutMessage(message, text)
+			for st, point in allpoints:
+				OutMessage(message, f'Номер студака: {st} Балл: {point}')
 			# OutMessage(message,allpoints)
 			
 		getAllPointsOfTeacher(teacher)
