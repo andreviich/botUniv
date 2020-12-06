@@ -78,7 +78,7 @@ def usualMessage(message):
 	allGroups = groups['name'].values.tolist()
 	print(comm)
 	if len(comm) < 2 and 'КОМАНДЫ' not in comm:
-		OutMessage(message,'Команда была введена неверно, повторите попытку. Для вывода всех команд введите команду "команды"')
+		OutMessage(message,'Команда была введена неверно, повторите попытку. Для вывода всех команд введите команду "/help"')
 	if 'СТУДЕНТЫ' in comm:
 		group = comm[1]
 		def getAllStudents(group):
@@ -267,7 +267,7 @@ def usualMessage(message):
 			elif 'СТУДЕНТЫ' in comm or 'ПРЕПОДАВАТЕЛИ' in comm:
 				pass 
 			else:
-				tryAgain(message,'Команда была введена неверно, повторите попытку. Для вывода всех команд введите команду "команды"')
+				tryAgain(message,'Команда была введена неверно, повторите попытку. Для вывода всех команд введите команду "/help"')
 				return
 		getAllPointsOfTeacherAndGroup(teacher, group)
 
